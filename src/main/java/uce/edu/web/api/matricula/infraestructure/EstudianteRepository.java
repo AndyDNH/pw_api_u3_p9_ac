@@ -8,4 +8,5 @@ import uce.edu.web.api.matricula.domain.Estudiante;
 public class EstudianteRepository implements PanacheRepository<Estudiante>{
     
     
+    
 }
