@@ -48,10 +48,17 @@ public class EstudianteService {
         if (estu.fechaNacimiento!=null) {
             est.fechaNacimiento=estu.fechaNacimiento;
         }
-        //se actualiza en dirtuycheck
+        //se actualiza en dirtycheck
     }
     @Transactional
     public void eliminarEstudiante(Integer id){
         this.estudianteRepository.deleteById(id.longValue());
     }
+
+    public List<Estudiante> buscarPorProvincia(String provincia, String genero){
+         //return this.estudianteRepository.find("provincia", provincia).list();
+        return this.estudianteRepository.find("provincia=?1 and genero = ?2", provincia, genero).list();
+    }
+
+
 }

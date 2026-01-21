@@ -1,6 +1,9 @@
 package uce.edu.web.api.matricula.interfaces;
 
 import java.util.List;
+
+import org.jboss.resteasy.annotations.Query;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -9,6 +12,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import uce.edu.web.api.matricula.aplication.EstudianteService;
 import uce.edu.web.api.matricula.domain.Estudiante;
 
@@ -53,6 +57,9 @@ public class EstudianteResource {
     public void borrarestudiante(@PathParam("id") Integer id){
         this.estudianteService.eliminarEstudiante(id);
     }
-    
-    
+    @GET
+    @Path("/buscarPorProvincia")
+    public List<Estudiante> buscarPorProvinvia (@QueryParam("provincia")String provincia,@QueryParam("genero") String genero){
+        return this.estudianteService.buscarPorProvincia(provincia, genero);
+    }
 }
