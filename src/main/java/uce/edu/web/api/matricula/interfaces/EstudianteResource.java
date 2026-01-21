@@ -17,6 +17,7 @@ import uce.edu.web.api.matricula.domain.Estudiante;
 public class EstudianteResource {
     @Inject
     private EstudianteService estudianteService;
+    
     @GET
     @Path("/todos")
     public List<Estudiante> listarTodos(){ 
