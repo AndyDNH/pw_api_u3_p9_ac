@@ -3,17 +3,15 @@ package uce.edu.web.api.matricula.interfaces;
 import java.util.List;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import uce.edu.web.api.matricula.aplication.MateriaService;
 import uce.edu.web.api.matricula.domain.Materia;
 
 @Path("/materia")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class MateriaResource {
 
     @Inject
@@ -21,50 +19,97 @@ public class MateriaResource {
 
     @GET
     @Path("")
-    public List<Materia> buscarTodos() {
-        return this.materiaService.listarTodos();
+    public Response buscarTodos() {
+        List<Materia> materias = materiaService.listarTodos();
+        // return Response.ok(materias).build(); se puede intercambiar segun se necesite c:
+        return Response.status(200).entity(materias).build(); 
     }
 
     @GET
-    @Path("/id/{id}")
-    public Materia buscarMateriaPorId(@PathParam("id") Integer id) {
-        return this.materiaService.consultarPorId(id);
+    @Path("/{id}")
+    public Response buscarMateriaPorId(@PathParam("id") Integer id) {
+        Materia materia = materiaService.consultarPorId(id);
+
+        if (materia == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Materia no encontrada")
+                    .build();
+        }
+
+        return Response.ok(materia).build(); 
     }
 
     @GET
     @Path("/horario/{horario}")
-    public List<Materia> buscarPorHorario(@PathParam("horario") String horario) {
-        return this.materiaService.consultarPorHorario(horario);
+    public Response buscarPorHorario(@PathParam("horario") String horario) {
+        List<Materia> materias = materiaService.consultarPorHorario(horario);
+        return Response.ok(materias).build();
     }
 
     @GET
     @Path("/encargado/{encargado}")
-    public List<Materia> buscarPorEncargado(@PathParam("encargado") String encargado) {
-        return this.materiaService.consultarPorEncargado(encargado);
+    public Response buscarPorEncargado(@PathParam("encargado") String encargado) {
+        List<Materia> materias = materiaService.consultarPorEncargado(encargado);
+        return Response.ok(materias).build();
     }
 
     @POST
-    @Path("")
-    public void guardarMateria(Materia materia){
-        this.materiaService.crearMateria(materia);
+    public Response guardarMateria(Materia materia) {
+        materiaService.crearMateria(materia);
+
+        return Response.status(Response.Status.CREATED)
+                .entity(materia)
+                .build();
     }
 
     @PUT
     @Path("/{id}")
-    public void actualizarMateria(@PathParam("id") Integer id, Materia materia){
-        this.materiaService.actualizarMateria(id, materia);
+    public Response actualizarMateria(
+            @PathParam("id") Integer id,
+            Materia materia) {
+
+        Materia existente = materiaService.consultarPorId(id);
+
+        if (existente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Materia no encontrada")
+                    .build();
+        }
+
+        materiaService.actualizarMateria(id, materia);
+        return Response.noContent().build();
     }
 
     @PATCH
     @Path("/{id}")
-    public void actualizarParcialMateria(@PathParam("id") Integer id, Materia materia){
-        this.materiaService.parcialActualizarMateria(id, materia);
+    public Response actualizarParcialMateria(
+            @PathParam("id") Integer id,
+            Materia materia) {
+
+        Materia existente = materiaService.consultarPorId(id);
+
+        if (existente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Materia no encontrada")
+                    .build();
+        }
+
+        materiaService.parcialActualizarMateria(id, materia);
+        return Response.noContent().build();
     }
 
     @DELETE
     @Path("/{id}")
-    public void elminarMateriaPorId(@PathParam("id") Integer id){
-        this.materiaService.eliminarPorId(id);
-    }
+    public Response eliminarMateriaPorId(@PathParam("id") Integer id) {
+        Materia existente = materiaService.consultarPorId(id);
 
+        if (existente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Materia no encontrada")
+                    .build();
+        }
+
+        materiaService.eliminarPorId(id);
+        return Response.noContent().build();
+    }
 }

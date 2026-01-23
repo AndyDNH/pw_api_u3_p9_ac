@@ -2,69 +2,101 @@ package uce.edu.web.api.matricula.interfaces;
 
 import java.util.List;
 
-import org.jboss.resteasy.annotations.Query;
-
 import jakarta.inject.Inject;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import uce.edu.web.api.matricula.aplication.EstudianteService;
 import uce.edu.web.api.matricula.domain.Estudiante;
 
 @Path("/estudiantes")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class EstudianteResource {
+
     @Inject
     private EstudianteService estudianteService;
 
     @GET
-    @Path("")
-    public List<Estudiante> listarTodos() {
-        System.out.println("Listar todos xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        return this.estudianteService.listarTodos();
+    public Response listarTodos() {
+        List<Estudiante> estudiantes = estudianteService.listarTodos();
+        return Response.ok(estudiantes).build();
     }
 
     @GET
     @Path("/provincia/genero")
-    public List<Estudiante> buscarPorProvinvia(@QueryParam("provincia") String provincia,
+    public Response buscarPorProvincia(
+            @QueryParam("provincia") String provincia,
             @QueryParam("genero") String genero) {
-        System.out.println("Listar provincia y genero xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
-        return this.estudianteService.buscarPorProvincia(provincia, genero);
+        List<Estudiante> estudiantes =
+                estudianteService.buscarPorProvincia(provincia, genero);
+        return Response.ok(estudiantes).build();
     }
 
     @GET
     @Path("/{id}")
-    public Estudiante consultarPotId(@PathParam("id") Integer id) {
-        return this.estudianteService.consultarPorID(id);
+    public Response consultarPorId(@PathParam("id") Integer id) {
+        Estudiante est = estudianteService.consultarPorID(id);
+
+        if (est == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Estudiante no encontrado")
+                    .build();
+        }
+
+        return Response.ok(est).build(); 
     }
 
     @POST
-    @Path("")
-    public void crearEstudiante(Estudiante estu) {
-        this.estudianteService.crearEstudiante(estu);
+    public Response crearEstudiante(Estudiante estu) {
+        estudianteService.crearEstudiante(estu);
+
+        return Response.status(Response.Status.CREATED)
+                .entity(estu)
+                .build();
     }
 
     @PUT
     @Path("/{id}")
-    public void actualizar(@PathParam("id") Integer id, Estudiante estu) {
-        this.estudianteService.actualizarEstudiante(id, estu);
+    public Response actualizar(@PathParam("id") Integer id, Estudiante estu) {
+        Estudiante existente = estudianteService.consultarPorID(id);
+
+        if (existente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Estudiante no encontrado")
+                    .build();
+        }
+
+        estudianteService.actualizarEstudiante(id, estu);
+        return Response.noContent().build(); // 204
     }
 
     @PATCH
     @Path("/{id}")
-    public void actualizarParcial(@PathParam("id") Integer id, Estudiante estu) {
-        this.estudianteService.parcialActuEstudiante(id, estu);
+    public Response actualizarParcial(@PathParam("id") Integer id, Estudiante estu) {
+        Estudiante existente = estudianteService.consultarPorID(id);
+
+        if (existente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Estudiante no encontrado")
+                    .build();
+        }
+
+        estudianteService.parcialActuEstudiante(id, estu);
+        return Response.noContent().build();
     }
 
     @DELETE
     @Path("/{id}")
-    public void borrarestudiante(@PathParam("id") Integer id) {
-        this.estudianteService.eliminarEstudiante(id);
-    }
+    public Response borrarEstudiante(@PathParam("id") Integer id) {
+        Estudiante existente = estudianteService.consultarPorID(id);
 
+        if (existente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Estudiante no encontrado")
+                    .build();
+        }
+        estudianteService.eliminarEstudiante(id);
+        return Response.noContent().build(); 
+    }
 }
