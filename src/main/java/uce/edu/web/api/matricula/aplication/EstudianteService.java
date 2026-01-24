@@ -1,7 +1,9 @@
 package uce.edu.web.api.matricula.aplication;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import uce.edu.web.api.matricula.aplication.representation.EstudianteRepresentation;
 import uce.edu.web.api.matricula.domain.Estudiante;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -14,12 +16,15 @@ public class EstudianteService {
     @Inject
     private EstudianteRepository estudianteRepository;
 
-    public List<Estudiante> listarTodos() {
-        return this.estudianteRepository.listAll();
+    public List<EstudianteRepresentation> listarTodos() {
+        List<EstudianteRepresentation> list = new ArrayList<>();
+        for(Estudiante estudiante : this.estudianteRepository.list()){
+            
+        }
     }
 
-    public Estudiante consultarPorID(Integer id) {
-        return this.estudianteRepository.findById(id.longValue());
+    public EstudianteRepresentation consultarPorID(Integer id) {
+        return this.mapperToER(estudianteRepository.findById(id.longValue()));
     }
 
     @Transactional
@@ -60,5 +65,26 @@ public class EstudianteService {
         return this.estudianteRepository.find("provincia=?1 and genero = ?2", provincia, genero).list();
     }
 
+    private EstudianteRepresentation mapperToER(Estudiante est){
+        EstudianteRepresentation estuR = new EstudianteRepresentation();
+        estuR.id = est.id;
+        estuR.nombre = est.nombre;
+        estuR.apellido = est.apellido;
+        estuR.fechaNacimiento = est.fechaNacimiento;
+        estuR.genero = est.genero;
+        estuR.provincia = est.provincia;
+        return estuR;
+        }
+
+        private Estudiante mapperToEstudiante(EstudianteRepresentation est){
+        Estudiante estudiante = new Estudiante();
+        estudiante.id = est.id;
+        estudiante.nombre = est.nombre;
+        estudiante.apellido = est.apellido;
+        estudiante.fechaNacimiento = est.fechaNacimiento;
+        estudiante.genero = est.genero;
+        estudiante.provincia = est.provincia;
+        return estudiante;
+        }
 
 }

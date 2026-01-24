@@ -1,7 +1,6 @@
 package uce.edu.web.api.matricula.interfaces;
 
 import java.util.List;
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

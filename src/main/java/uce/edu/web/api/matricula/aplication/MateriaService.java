@@ -4,7 +4,6 @@ import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import uce.edu.web.api.matricula.domain.Materia;
 import uce.edu.web.api.matricula.infraestructure.MateriaRepository;
