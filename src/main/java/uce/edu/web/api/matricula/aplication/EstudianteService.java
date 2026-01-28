@@ -2,6 +2,7 @@ package uce.edu.web.api.matricula.aplication;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import uce.edu.web.api.matricula.aplication.representation.EstudianteRepresentation;
 import uce.edu.web.api.matricula.domain.Estudiante;
@@ -17,10 +18,8 @@ public class EstudianteService {
     private EstudianteRepository estudianteRepository;
 
     public List<EstudianteRepresentation> listarTodos() {
-        List<EstudianteRepresentation> list = new ArrayList<>();
-        for(Estudiante estudiante : this.estudianteRepository.list()){
-            
-        }
+        return this.estudianteRepository.listAll()
+        .stream().map(this::mapperToER).collect(Collectors.toList());  
     }
 
     public EstudianteRepresentation consultarPorID(Integer id) {
@@ -28,41 +27,47 @@ public class EstudianteService {
     }
 
     @Transactional
-    public void crearEstudiante(Estudiante estu) {
-        this.estudianteRepository.persist(estu);
+    public void crearEstudiante(EstudianteRepresentation estu) {
+        this.estudianteRepository.persist(mapperToEstudiante(estu));
     }
 
     // Se actualiza automaticamente al detectar cambios por dirty checking
-     @Transactional
-    public void actualizarEstudiante(Integer id, Estudiante estu){
-        Estudiante est = this.consultarPorID(id);
-        est.apellido=estu.apellido;
-        est.nombre=estu.nombre;
-        est.fechaNacimiento = estu.fechaNacimiento;
+    @Transactional
+    public void actualizarEstudiante(Integer id, EstudianteRepresentation estuR) {
+        Estudiante entity = estudianteRepository.findById(id.longValue());
+        
+        if (entity != null) {
+            entity.nombre = estuR.nombre;
+            entity.apellido = estuR.apellido;
+            entity.fechaNacimiento = estuR.fechaNacimiento;
+            entity.genero = estuR.genero;
+            entity.provincia = estuR.provincia;
+        }
+    }
 
-    }
     @Transactional
-    public void parcialActuEstudiante(Integer id, Estudiante estu){
-        Estudiante est = this.consultarPorID(id);
-        if (estu.nombre!=null) {
-            est.nombre=estu.nombre;
+    public void parcialActuEstudiante(Integer id, EstudianteRepresentation estuR) {
+        Estudiante entity = estudianteRepository.findById(id.longValue());
+        
+        if (entity != null) {
+            if (estuR.nombre != null) entity.nombre = estuR.nombre;
+            if (estuR.apellido != null) entity.apellido = estuR.apellido;
+            if (estuR.fechaNacimiento != null) entity.fechaNacimiento = estuR.fechaNacimiento;
+            if (estuR.genero != null) entity.genero = estuR.genero;
+            if (estuR.provincia != null) entity.provincia = estuR.provincia;
         }
-        if (estu.apellido!=null) {
-            est.apellido=estu.apellido;
-        }
-        if (estu.fechaNacimiento!=null) {
-            est.fechaNacimiento=estu.fechaNacimiento;
-        }
-        //se actualiza en dirtycheck
     }
+
     @Transactional
-    public void eliminarEstudiante(Integer id){
+    public void eliminarEstudiante(Integer id) {
         this.estudianteRepository.deleteById(id.longValue());
     }
 
-    public List<Estudiante> buscarPorProvincia(String provincia, String genero){
+    public List<EstudianteRepresentation> buscarPorProvincia(String provincia, String genero){
          //return this.estudianteRepository.find("provincia", provincia).list();
-        return this.estudianteRepository.find("provincia=?1 and genero = ?2", provincia, genero).list();
+        return this.estudianteRepository
+        .find("provincia=?1 and genero = ?2", provincia, genero).list()
+        .stream().map(this::mapperToER).collect(Collectors.toList());
     }
 
     private EstudianteRepresentation mapperToER(Estudiante est){
