@@ -25,6 +25,7 @@ public class Estudiante extends PanacheEntityBase{
     public LocalDateTime fechaNacimiento;
     public String provincia;
     public String genero;
+    
 
     @OneToMany(mappedBy = "estudiante",cascade = CascadeType.ALL, fetch =  FetchType.LAZY)
     public List<Hijo> hijos;

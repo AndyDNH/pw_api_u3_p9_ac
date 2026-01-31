@@ -3,6 +3,8 @@ package uce.edu.web.api.matricula.interfaces;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -27,6 +29,7 @@ public class EstudianteResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("admin")
     public Response listarTodos() {
         List<EstudianteRepresentation> estudiantes = estudianteService.listarTodos().stream().map(this::construirLink).collect(Collectors.toList());
         return Response.ok(estudiantes).build();
@@ -35,6 +38,8 @@ public class EstudianteResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/provincia/genero")
+    // @PermitAll
+    @RolesAllowed("admin")
     public Response buscarPorProvincia(
             @QueryParam("provincia") String provincia,
             @QueryParam("genero") String genero) {
@@ -45,7 +50,7 @@ public class EstudianteResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-
+    @RolesAllowed("admin")
     public EstudianteRepresentation consultarPorId(@PathParam("id") Integer id) {
         return this.construirLink(this.estudianteService.consultarPorID(id));
     }
@@ -53,6 +58,7 @@ public class EstudianteResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("admin")
     public Response crearEstudiante(EstudianteRepresentation estu) {
         estudianteService.crearEstudiante(estu);
 
@@ -65,6 +71,7 @@ public class EstudianteResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("admin")
     public Response actualizar(@PathParam("id") Integer id, EstudianteRepresentation estu) {
         EstudianteRepresentation existente = estudianteService.consultarPorID(id);
 
@@ -81,6 +88,7 @@ public class EstudianteResource {
     @PATCH
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("admin")
     public Response actualizarParcial(@PathParam("id") Integer id, EstudianteRepresentation estu) {
         EstudianteRepresentation existente = estudianteService.consultarPorID(id);
 
@@ -96,6 +104,7 @@ public class EstudianteResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     public Response borrarEstudiante(@PathParam("id") Integer id) {
         EstudianteRepresentation existente = estudianteService.consultarPorID(id);
 
@@ -112,6 +121,7 @@ public class EstudianteResource {
     @Path("/{id}/hijos")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("admin")
     public List<HijoRepresentation> buscarPorIdEstudiante(@PathParam("id")Integer id){
         return this.hijoService.buscarPorIdEstudiante(id);
     }
